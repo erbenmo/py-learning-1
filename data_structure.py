@@ -49,6 +49,7 @@ class Queue:
         return self.size() == 0
 
 class Point:
-    def __init__(self, _w, _h):
+    def __init__(self, _w, _h, _p):
         self.width = _w
         self.height = _h
+        self.path = _p

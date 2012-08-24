@@ -13,6 +13,7 @@ class Michael:
         print 'initializing...'
         self.rooms = []
         self.entrance = []
+        self.paths = []
 
     def read_input(self):
         if sys.argv[1] == '--Stack':
@@ -36,7 +37,7 @@ class Michael:
                     cur = f.read(1)
                     cur_row.append(cur)
                     if cur == 'I':
-                        self.entrance.append(Point(k, j))                 
+                        self.entrance.append(Point(k, j, ""))
                 f.read(1)
                 cur_room.append(cur_row)
             self.rooms.append(cur_room)
@@ -49,7 +50,6 @@ class Michael:
         
     def run(self):        
         for i in range(self.room_num):
-            print 'Entering room ' + str(i)
             if(not self.escape_room(i)):
                 print 'ERROR in ROOM #' + str(i)
                 return False
@@ -59,46 +59,52 @@ class Michael:
         ok = False
         
         if self.use_stack:
-            q = Queue()
-        else:
             q = Stack()
+        else:
+            q = Queue()
 
         cur_ent = self.entrance[room_id]
         cur_room = self.rooms[room_id]
         q.push(cur_ent)
 
         while(not q.empty()):
-            cur = q.pop()            
-            print "Pop: " + str(cur.height) + ", " + str(cur.width)
+            cur = q.pop()
+            print "Pop: " + cur.path
             
             if(cur_room[cur.height][cur.width] == 'O' or
                cur_room[cur.height][cur.width] == 'T'):
                 ok = True
+                self.paths.append(cur.path)
                 break
 
             # mark as visited
             cur_room[cur.height][cur.width] = 'x'
             
             w,h = cur.width, cur.height
+            p = cur.path
             
-            N = Point(w, h-1)
-            S = Point(w, h+1)
-            E = Point(w+1, h)
-            W = Point(w-1, h)
+            N = Point(w, h-1, p+"N")
+            S = Point(w, h+1, p+"S")
+            E = Point(w+1, h, p+"E")
+            W = Point(w-1, h, p+"W")
+
+
+            # N,S,E,W
 
             if(self.check(N, room_id)):
-                print "Push: " + str(N.height) + ", " + str(N.width)
+                print "Psh: " + N.path
                 q.push(N)
             if(self.check(S, room_id)):
-                print "Push: " + str(S.height) + ", " + str(S.width)
+                print "Psh: " + S.path
                 q.push(S)
             if(self.check(E, room_id)):
-                print "Push: " + str(E.height) + ", " + str(E.width)
+                print "Psh: " + E.path
                 q.push(E)
             if(self.check(W, room_id)):
-                print "Push: " + str(W.height) + ", " + str(W.width)
+                print "Psh: " + W.path
                 q.push(W)
 
+                
         return ok
          
 
@@ -143,12 +149,17 @@ class Michael:
             sys.stdout.write(str(cur_ent.height))
             sys.stdout.write('\n')
 
+    def print_result(self):
+        for i in range(len(self.paths)):
+            print self.paths[i]
+
 def main():
     michael = Michael()
     michael.read_input()
     ok = michael.run()
     if(not ok):
         print 'fail!'
+    michael.print_result()
     
 
 if __name__ == "__main__":
