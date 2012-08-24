@@ -6,6 +6,7 @@ from data_structure import Stack, Queue, Point
 #  I entrance
 #  O exit
 #  T tunnel
+#  x visited
 
 class Michael:
     def __init__(self):
@@ -51,9 +52,12 @@ class Michael:
             print 'Entering room ' + str(i)
             if(not self.escape_room(i)):
                 print 'ERROR in ROOM #' + str(i)
-                return false
+                return False
+        return True
 
     def escape_room(self, room_id):
+        ok = False
+        
         if self.use_stack:
             q = Queue()
         else:
@@ -64,10 +68,16 @@ class Michael:
         q.push(cur_ent)
 
         while(not q.empty()):
-            cur = q.pop()
+            cur = q.pop()            
+            print "Pop: " + str(cur.height) + ", " + str(cur.width)
+            
             if(cur_room[cur.height][cur.width] == 'O' or
                cur_room[cur.height][cur.width] == 'T'):
+                ok = True
                 break
+
+            # mark as visited
+            cur_room[cur.height][cur.width] = 'x'
             
             w,h = cur.width, cur.height
             
@@ -77,33 +87,42 @@ class Michael:
             W = Point(w-1, h)
 
             if(self.check(N, room_id)):
-                cur.push(N)
+                print "Push: " + str(N.height) + ", " + str(N.width)
+                q.push(N)
             if(self.check(S, room_id)):
-                cur.push(S)
+                print "Push: " + str(S.height) + ", " + str(S.width)
+                q.push(S)
             if(self.check(E, room_id)):
-                cur.push(E)
+                print "Push: " + str(E.height) + ", " + str(E.width)
+                q.push(E)
             if(self.check(W, room_id)):
-                cur.push(W)
+                print "Push: " + str(W.height) + ", " + str(W.width)
+                q.push(W)
 
-        return True
+        return ok
          
 
 
     def check(self, p, room_id):
-        w = len(self.rooms[room_id])
-        h = len(self.rooms[room_id][0])
+        h = len(self.rooms[room_id])
+        w = len(self.rooms[room_id][0])
+
+#        print "room#: " + str(room_id)
+#        print "width: " + str(w)
+#        print "height: " + str(h)
         
         # out of map
         if p.width < 0 or p.height < 0 or p.width >= w or p.height >= h:
             return False 
 
-        property = self.rooms[room_id][h][w]
+#       print "checking... " + str(p.height) + ", " + str(p.width)
+        property = self.rooms[room_id][p.height][p.width]
         
         # if obstacle, entrance or visited, don't revisit
         if property == '@' or property == 'I' or property == 'x':
             return False
 
-        return true;
+        return True;
 
         
 
