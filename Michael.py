@@ -1,4 +1,5 @@
 import sys
+from data_structure import Stack, Queue, Point
 
 #  . open
 #  @ obstacle
@@ -10,6 +11,7 @@ class Michael:
     def __init__(self):
         print 'initializing...'
         self.rooms = []
+        self.entrance = []
 
     def read_input(self):
         if sys.argv[1] == '--Stack':
@@ -30,22 +32,80 @@ class Michael:
             for j in range(height):
                 cur_row = []
                 for k in range(width):
-                    cur_row.append(f.read(1))
+                    cur = f.read(1)
+                    cur_row.append(cur)
+                    if cur == 'I':
+                        self.entrance.append(Point(k, j))                 
                 f.read(1)
                 cur_room.append(cur_row)
             self.rooms.append(cur_room)
-        self.print_room()
+        #self.print_room()
     
     def check_input(self):
         print 'idle'
                     
 
         
-    def run(self):
-        print ''
+    def run(self):        
+        for i in range(self.room_num):
+            print 'Entering room ' + str(i)
+            if(not self.escape_room(i)):
+                print 'ERROR in ROOM #' + str(i)
+                return false
 
     def escape_room(self, room_id):
-        print ''
+        if self.use_stack:
+            q = Queue()
+        else:
+            q = Stack()
+
+        cur_ent = self.entrance[room_id]
+        cur_room = self.rooms[room_id]
+        q.push(cur_ent)
+
+        while(not q.empty()):
+            cur = q.pop()
+            if(cur_room[cur.height][cur.width] == 'O' or
+               cur_room[cur.height][cur.width] == 'T'):
+                break
+            
+            w,h = cur.width, cur.height
+            
+            N = Point(w, h-1)
+            S = Point(w, h+1)
+            E = Point(w+1, h)
+            W = Point(w-1, h)
+
+            if(self.check(N, room_id)):
+                cur.push(N)
+            if(self.check(S, room_id)):
+                cur.push(S)
+            if(self.check(E, room_id)):
+                cur.push(E)
+            if(self.check(W, room_id)):
+                cur.push(W)
+
+        return True
+         
+
+
+    def check(self, p, room_id):
+        w = len(self.rooms[room_id])
+        h = len(self.rooms[room_id][0])
+        
+        # out of map
+        if p.width < 0 or p.height < 0 or p.width >= w or p.height >= h:
+            return False 
+
+        property = self.rooms[room_id][h][w]
+        
+        # if obstacle, entrance or visited, don't revisit
+        if property == '@' or property == 'I' or property == 'x':
+            return False
+
+        return true;
+
+        
 
     def print_room(self):
         for i in range(len(self.rooms)):
@@ -57,9 +117,20 @@ class Michael:
                 sys.stdout.write('\n')
             sys.stdout.write('\n')
 
+        for i in range(len(self.entrance)):
+            cur_ent = self.entrance[i]
+            sys.stdout.write(str(cur_ent.width))
+            sys.stdout.write(' ')
+            sys.stdout.write(str(cur_ent.height))
+            sys.stdout.write('\n')
+
 def main():
     michael = Michael()
     michael.read_input()
+    ok = michael.run()
+    if(not ok):
+        print 'fail!'
+    
 
 if __name__ == "__main__":
     main()

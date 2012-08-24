@@ -22,6 +22,9 @@ class Stack:
     def size(self):
         return self.len
 
+    def empty(self):
+        return self.size() == 0
+
 class Queue:
     def __init__(self):
         self.queue = deque()
@@ -42,7 +45,10 @@ class Queue:
     def size(self):
         return self.len
 
+    def empty(self):
+        return self.size() == 0
+
 class Point:
-    def __init__(self, _x, _y):
-        self.x = _x
-        self.y = _y
+    def __init__(self, _w, _h):
+        self.width = _w
+        self.height = _h
