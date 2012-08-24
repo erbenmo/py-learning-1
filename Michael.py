@@ -1,5 +1,11 @@
 import sys
 
+#  . open
+#  @ obstacle
+#  I entrance
+#  O exit
+#  T tunnel
+
 class Michael:
     def __init__(self):
         print 'initializing...'
