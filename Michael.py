@@ -41,7 +41,7 @@ class Michael:
                 f.read(1)
                 cur_room.append(cur_row)
             self.rooms.append(cur_room)
-        #self.print_room()
+        self.print_room()
     
     def check_input(self):
         print 'idle'
@@ -69,7 +69,7 @@ class Michael:
 
         while(not q.empty()):
             cur = q.pop()
-            print "Pop: " + cur.path
+#            print "Pop: " + cur.path
             
             if(cur_room[cur.height][cur.width] == 'O' or
                cur_room[cur.height][cur.width] == 'T'):
@@ -92,16 +92,16 @@ class Michael:
             # N,S,E,W
 
             if(self.check(N, room_id)):
-                print "Psh: " + N.path
+#                print "Psh: " + N.path
                 q.push(N)
             if(self.check(S, room_id)):
-                print "Psh: " + S.path
+#                print "Psh: " + S.path
                 q.push(S)
             if(self.check(E, room_id)):
-                print "Psh: " + E.path
+#                print "Psh: " + E.path
                 q.push(E)
             if(self.check(W, room_id)):
-                print "Psh: " + W.path
+#                print "Psh: " + W.path
                 q.push(W)
 
                 
