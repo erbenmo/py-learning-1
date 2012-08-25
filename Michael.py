@@ -15,6 +15,9 @@ class Michael:
         self.entrance = []
         self.paths = []
 
+        self.dir = [(0, -1), (0, 1), (1, 0), (-1, 0)]
+        self.dir_str = ['N', 'S', 'E', 'W']
+
     def read_input(self):
         if sys.argv[1] == '--Stack':
             self.use_stack = True
@@ -41,13 +44,10 @@ class Michael:
                 f.read(1)
                 cur_room.append(cur_row)
             self.rooms.append(cur_room)
-        self.print_room()
     
     def check_input(self):
         print 'idle'
-                    
-
-        
+    
     def run(self):        
         for i in range(self.room_num):
             if(not self.escape_room(i)):
@@ -68,60 +68,42 @@ class Michael:
         q.push(cur_ent)
 
         while(not q.empty()):
-            cur = q.pop()
-#            print "Pop: " + cur.path
-            
-            if(cur_room[cur.height][cur.width] == 'O' or
-               cur_room[cur.height][cur.width] == 'T'):
-                ok = True
-                self.paths.append(cur.path)
+            if ok:
                 break
-
-            # mark as visited
-            cur_room[cur.height][cur.width] = 'x'
+            
+            cur = q.pop()                        
             
             w,h = cur.width, cur.height
             p = cur.path
-            
-            N = Point(w, h-1, p+"N")
-            S = Point(w, h+1, p+"S")
-            E = Point(w+1, h, p+"E")
-            W = Point(w-1, h, p+"W")
 
-
-            # N,S,E,W
-
-            if(self.check(N, room_id)):
-#                print "Psh: " + N.path
-                q.push(N)
-            if(self.check(S, room_id)):
-#                print "Psh: " + S.path
-                q.push(S)
-            if(self.check(E, room_id)):
-#                print "Psh: " + E.path
-                q.push(E)
-            if(self.check(W, room_id)):
-#                print "Psh: " + W.path
-                q.push(W)
-
+            cur_points = []
+            for i in range(len(self.dir)):
+                dw, dh = self.dir[i]
+                dp = self.dir_str[i]
+                cur_points.append(Point(w+dw, h+dh, p+dp))
                 
+            for i in range(len(cur_points)):
+                cur_cand = cur_points[i]
+                if(self.check(cur_cand, room_id)):
+                    if(cur_room[cur_cand.height][cur_cand.width] == 'O' or
+                       cur_room[cur_cand.height][cur_cand.width] == 'T'):
+                        ok = True
+                        self.add_path(cur_cand, room_id,
+                                      len(self.rooms[room_id]), len(self.rooms[room_id][0]))
+                        break
+                    cur_room[cur_cand.height][cur_cand.width] = 'x'
+                    q.push(cur_points[i])
+
         return ok
-         
-
-
+    
     def check(self, p, room_id):
         h = len(self.rooms[room_id])
         w = len(self.rooms[room_id][0])
 
-#        print "room#: " + str(room_id)
-#        print "width: " + str(w)
-#        print "height: " + str(h)
-        
         # out of map
         if p.width < 0 or p.height < 0 or p.width >= w or p.height >= h:
             return False 
 
-#       print "checking... " + str(p.height) + ", " + str(p.width)
         property = self.rooms[room_id][p.height][p.width]
         
         # if obstacle, entrance or visited, don't revisit
@@ -129,6 +111,20 @@ class Michael:
             return False
 
         return True;
+
+    def add_path(self, p, room_id, h, w):
+        if (room_id == self.room_num - 1):
+            self.paths.append(p.path)
+        elif(p.height == h-1):
+            self.paths.append(p.path + "S")
+        elif(p.height == 0):
+            self.paths.append(p.path + "N")
+        elif(p.width == 0):
+            self.paths.append(p.path + "W")
+        elif(p.width == w-1):
+            self.paths.append(p.path + "E")
+        else:
+            print "Not expected!"
 
         
 
@@ -149,7 +145,7 @@ class Michael:
             sys.stdout.write(str(cur_ent.height))
             sys.stdout.write('\n')
 
-    def print_result(self):
+    def print_result(self):        
         for i in range(len(self.paths)):
             print self.paths[i]
 
@@ -158,8 +154,9 @@ def main():
     michael.read_input()
     ok = michael.run()
     if(not ok):
-        print 'fail!'
-    michael.print_result()
+        print 'Escape failed.'
+    else:
+        michael.print_result()
     
 
 if __name__ == "__main__":
